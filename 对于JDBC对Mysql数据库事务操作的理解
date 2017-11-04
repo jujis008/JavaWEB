@@ -1,6 +1,6 @@
 看教学视频产生了一个疑问,按照老师说的意思,开启事务后,再提交事务,那么之后的update(DML)操作,是自动提交的,我对这个问题进行了测试.
 
-1.首先是使用JDBC操作Mysql事务:
+1.首先是使用JDBC操作Mysql事务(使用了c3p0连接池和Dbutils工具包):
 
 DataSource dataSource = new ComboPooledDataSource();
 conn = dataSource.getConnection();
@@ -8,11 +8,18 @@ QueryRunner qr = new QueryRunner();
 conn.setAutoCommit(false);
 String sql = "update user set upassword=111111 where uname='tom'";
 qr.update(conn, sql);
+
 conn.commit();
+
 sql = "update user set upassword=111111 where uname='bob'";
 qr.update(conn, sql);
 conn.close();
 
 执行结果是,只有tom的密码被更改了,也就是说,对bob的密码更新操作没有被提交.
-我将Commit换成了rollback再进行测试,结果是两条更新操作都没有生效.
-通过以上测试说明,通过JDBC操作Mysql事务,开启事务后是需要手动关闭的,提交事务不等于关闭自动提交!
+我将commit换成了rollback再进行测试,结果是两条更新操作都没有生效.
+我将cmmit换成了setAutoCommit(true),结果是两条更新操作都生效了;
+通过以上测试说明,通过JDBC操作Mysql事务,setAutoCommit(false)方法开启事务后是需要手动关闭setAutoCommit(true)的,提交事务不等于关闭自动提交!
+并且在事务没有提交的情况下,setAutoCommit(true)方法会自动提交事务.
+
+后来我在命令行中通过sql语句进行了测试,发现sql语句直接操作,start transaction命令开启事务,只要commit命令进行了提交,后面的单条DML语句都能自动提交!
+这是和JDBC事务操作截然相反的地方.
