@@ -1,0 +1,15 @@
+在我们使用BeanUtils将Map集合封装到bean实体时,如果有字段无法自动转换时,如不能自动将String转到Date,就会出错.
+解决办法有两种,一种是更改bean中字段的属性,将date改为String;另一种是使用类CovertUtils的register方法注册一个类型转换器,代码如下:
+
+ConverUtils.register(new Converter(){
+  public Object convert(Class clazz, Object value){
+  //将String转成date
+  SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+  Date date = null;
+  try{
+    parse = format.parse(value.toString());
+  }catch(ParseException e){
+    e.printStackTrace();
+  
+  }
+},Date.class)
