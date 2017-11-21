@@ -1,0 +1,1 @@
+经过测试，当表单采用post方式提交的时候，可以携带url参数，HttpServletRequest对象能获取到url参数
