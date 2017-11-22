@@ -1,0 +1,18 @@
+//创建xml解析器
+SAXReader saxReader = new SAXReader();
+//解析xml文件，生成文档对象
+Document document = saxReader.read(BeanFactory.class.getClassLoader().getResource("beanfactory.xml"));
+//选择单个节点，参数是xpath规则
+Element element = (Element) document.selectSingleNode("//bean[@id='"+id+"']");
+//获取节点的属性class
+String className = element.attributeValue("class");
+//使用反射创建类的实例
+Class<?> clazz = Class.forName(className);
+Object obj = clazz.newInstance();
+
+xml文件内容如下：
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<!-- 配置ProductDao接口的实现类 -->
+	<bean id="ProductDao" class="practice.shop.dao.impl.ProductDaoImpl"></bean>
+</beans>
