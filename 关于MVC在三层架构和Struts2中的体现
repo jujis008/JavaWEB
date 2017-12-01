@@ -1,0 +1,11 @@
+javaEE规范将后端分为三层,web层,service层,dao层
+再加上前端页面,一共是四层
+MVC在这四层中是如何体现的呢?
+M:业务模型,体现为service+dao
+V:视图,体现为前端页面
+C:控制器,体现为servlet
+
+Struts2中MVC又是如何体现的呢?
+Struts2的核心filter(StrutsPrepareAndExecuteFilter),作为控制器,C
+Struts2的result页面,作为视图,V
+Struts2的Action,作为业务模型,M
