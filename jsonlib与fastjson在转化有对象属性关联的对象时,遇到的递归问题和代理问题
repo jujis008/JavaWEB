@@ -43,7 +43,7 @@ JsonConfig config = new JsonConfig();
 config.setExcludes(new  String[]{"customer"});
 String jsonString = JSONObject.fromObject(lkm, config).toString();
 
-对于jsonfast,使用注解@JsonField(serialize=false)给不需要序列化的属性加上即可;
+对于fastjson,使用注解@JsonField(serialize=false)给不需要序列化的属性加上即可;
 例:
 //表达和联系人的一对多关系
 @JsonField(serialize=false)
@@ -53,5 +53,5 @@ private Set<LinkMan> linkMans = new HashSet<LinkMan>();//联系人
 String jsonString = Json.toJsonString(lkm);
 
 在web项目中如果使用了hibernate框架,还会遇到另一个问题,因为懒加载(lazy)的存在,如果linkman对象是通过hibernate的获取到的代理对象,
-那么,再获取linkMan对象的customer时jsonlib会出错(jsonlib是使用了反射的方式获取),而jsonfast不会,关闭懒加载可以解决问题
+那么,在获取linkMan对象的customer时jsonlib会出错(jsonlib是使用了反射的方式获取),而fastjson不会,关闭懒加载可以解决问题
 		
