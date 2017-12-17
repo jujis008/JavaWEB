@@ -1,0 +1,57 @@
+以customer对象和LinkMan对象为例,customer和linkMan是一对多的关系:
+
+public class Customer {
+	private Long cust_id;//客户编号(主键)
+	private String cust_name;//客户名称(公司名称)
+	private Long cust_user_id;//负责人id
+	private Long cust_create_id;//创建人id
+	private String cust_linkman;//联系人
+	private String cust_phone;//固定电话
+	private String cust_mobile;//移动电话
+  
+	//表达和联系人的一对多关系
+	private Set<LinkMan> linkMans = new HashSet<LinkMan>();//联系人
+  ....
+}
+
+public class LinkMan {
+
+	private Long lkm_id;//联系人编号(主键)
+	private String lkm_name;//联系人姓名
+	private Character lkm_gender;//联系人性别
+	private String lkm_phone;//联系人办公电话
+	private String lkm_mobile;//联系人手机
+	private String lkm_email;//联系人邮箱
+	private String lkm_qq;//联系人qq
+	private String lkm_position;//联系人职位
+	private String lkm_memo;//联系人备注
+	
+	//表达多对一关系
+	private Customer customer;//客户 [lkm_cust_id]
+  ...
+}
+
+代码如下:
+String jsonString = JsonObject.fromObject(lkm).toString();     //(list集合或数组的话用JsonArray)
+
+如果使用jsonlib转化LinkMan对象为json字符串的话,由于linkman对象的属性中关联了customer对象,
+会进入customer对象中,而在customer对象中又关联了linkman对象,这样就变成了无限递归,导致转化出错.
+
+解决方案:
+设置customer的linkman属性不进行json序列化,使用JsonConfig
+JsonConfig config = new JsonConfig();
+config.setExcludes(new  String[]{"customer"});
+String jsonString = JSONObject.fromObject(lkm, config).toString();
+
+对于jsonfast,使用注解@JsonField(serialize=false)给不需要序列化的属性加上即可;
+例:
+//表达和联系人的一对多关系
+@JsonField(serialize=false)
+private Set<LinkMan> linkMans = new HashSet<LinkMan>();//联系人
+
+代码:
+String jsonString = Json.toJsonString(lkm);
+
+在web项目中如果使用了hibernate框架,还会遇到另一个问题,因为懒加载(lazy)的存在,如果linkman对象是通过hibernate的获取到的代理对象,
+那么,再获取linkMan对象的customer时jsonlib会出错(jsonlib是使用了反射的方式获取),而jsonfast不会,关闭懒加载可以解决问题
+		
