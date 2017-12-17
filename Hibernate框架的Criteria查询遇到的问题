@@ -1,0 +1,40 @@
+实体对象结构如下:
+public class SaleVisit { 
+	
+	private String visit_id;
+	private Date visit_time;// 拜访时间
+	private String visit_interviewee;// 被拜访人
+	private String visit_addr;// 拜访地点
+	private String visit_detail;// 拜访详情
+	private Date visit_nexttime;// 下次拜访时间
+	
+	//表达和客户,联系人的多对一关系
+	private Customer customer;// 客户id[visit_cust_id]
+	private User user;// 负责人id[visit_user_id]
+  
+  ...
+ }
+ 
+ 映射关系如下:
+  <!-- 多对一 -->
+  <many-to-one name="customer" column="visit_cust_id" class="Customer" ></many-to-one>
+  <!-- 多对一 -->
+  <many-to-one name="user" column="visit_user_id" class="User" ></many-to-one>
+  
+ 相关代码如下:
+ //封装离线查询对象
+  DetachedCriteria dc = DetachedCriteria.forClass(SaleVisit.class);
+  //dc.add(Restrictions.eq("customer.cust_id",1l);
+  dc.add(Restrictions.eq("customer.cust_name","客户名称"));
+  //1 调用Service查询分页数据(PageBean)
+  PageBean pb = svs.getPageBean(dc,currentPage,pageSize);
+  //2 将PageBean放入request域,转发到列表页面显示
+  ActionContext.getContext().put("pageBean", pb);
+  return "list";
+  
+  在测试过程中发现,如果dc.add()添加查询条件,添加的条件是customer的cust_id,查询没有问题(返回的list是Salevisit对象);
+  如果添加的条件是,customer的cust_name,查询出错,返回的list是Customer对象,得不到想要的结果.
+  分析原因,customer的cust_id是customer的主键,在表salevisit中,外键字段visit_cust_id与其是主外键关系
+  而cust_name与salevisit无主外键的关系,所以无法查询
+  
+  结论:以后criteria尽量用来进行单表查询
