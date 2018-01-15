@@ -1,0 +1,38 @@
+实体对象结构如下:
+public class SaleVisit { 
+	
+	private String visit_id;
+	private Date visit_time;// 拜访时间
+	private String visit_interviewee;// 被拜访人
+	private String visit_addr;// 拜访地点
+	private String visit_detail;// 拜访详情
+	private Date visit_nexttime;// 下次拜访时间
+	
+	//表达和客户,联系人的多对一关系
+	private Customer customer;// 客户id[visit_cust_id]
+	private User user;// 负责人id[visit_user_id]
+  
+  ...
+ }
+ 
+ 映射关系如下:
+  <!-- 多对一 -->
+  <many-to-one name="customer" column="visit_cust_id" class="Customer" ></many-to-one>
+  <!-- 多对一 -->
+  <many-to-one name="user" column="visit_user_id" class="User" ></many-to-one>
+  
+ 相关代码如下:
+  //封装离线查询对象
+  DetachedCriteria dc = DetachedCriteria.forClass(SaleVisit.class);
+  //如果需要按关联属性customer对象的属性来查询的话,除了cust_id以外的字段,其他字段都需要为customer这个关联属性设置别名
+  dc.createAlias("customer", "c");
+  dc.add(Restrictions.eq("c.cust_name","客户名称"));
+  //如果直接这样查询,结果将会被封装为由SaleVisit对象和Customer对象所组成的Object数组,而非是我们想要的SaleVisit对象,
+  //所以要设置结果集的处理方式,这样查询的结果中,Customer对象会被封装在SaleVisit对象的关联属性中,返回的是SaleVisit对象
+  dc.setResultTransformer(DetachedCriteria.ROOT_ENTITY);
+  
+  结论:
+	1.为关联属性使用别名
+	 dc.createAlias("customer", "c");
+	2.设置结果集的处理方式
+	 dc.setResultTransformer(DetachedCriteria.ROOT_ENTITY);
