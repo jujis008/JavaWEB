@@ -53,5 +53,6 @@ private Set<LinkMan> linkMans = new HashSet<LinkMan>();//联系人
 String jsonString = Json.toJsonString(lkm);
 
 在web项目中如果使用了hibernate框架,还会遇到另一个问题,因为懒加载(lazy)的存在,如果linkman对象是通过hibernate的获取到的代理对象,
-那么,在获取linkMan对象的customer时jsonlib会出错(jsonlib是使用了反射的方式获取),而fastjson不会,关闭懒加载可以解决问题(不关闭也可以通过其他办法解决,请百度)
+那么,在获取linkMan对象的customer时jsonlib会出错(jsonlib是使用了反射的方式获取),而fastjson不会,
+关闭懒加载(在linkman.hbm.xml中customer映射上关闭对customer的懒加载)可以解决问题(不关闭也可以通过其他办法解决,请百度)
 		
